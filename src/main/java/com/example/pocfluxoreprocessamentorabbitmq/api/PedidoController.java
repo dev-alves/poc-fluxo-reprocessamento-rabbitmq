@@ -24,7 +24,7 @@ public class PedidoController {
         Pedido pedido = new Pedido();
         pedido.setNome("Carretilha Shimano");
 
-        LOGGER.info("Enviando mensagem: %s" + pedido);
+        LOGGER.info("Enviando mensagem: " + pedido);
         rabbitTemplate.convertAndSend("DELAYED-REPROCESS-MESSAGE-ERROR-EXCHANGE", "DELAYED-REPROCESS-MESSAGE-ERROR-QUEUE", pedido, message -> {
             message.getMessageProperties().setHeader("x-delay", 60000);
             return message;

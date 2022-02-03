@@ -8,11 +8,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class QueueConfig {
 
-    private final String queueNameDelayedReprocessMessageError = "DELAYED-REPROCESS-MESSAGE-ERROR-QUEUE";
-
     @Bean
     public Queue reprocessMessageErrorQueue() {
-        return QueueBuilder.durable(queueNameDelayedReprocessMessageError)
+        return QueueBuilder.durable(RoutingKeyEnum.DELAYED_REPROCESS_MESSAGE_ERROR.getDescricao())
                 .build();
     }
 
