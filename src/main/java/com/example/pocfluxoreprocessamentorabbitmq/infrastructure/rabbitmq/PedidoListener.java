@@ -22,7 +22,7 @@ public class PedidoListener {
     public void consumer(Message message) {
         Pedido pedido = (Pedido) messageConverter.fromMessage(message);
 
-        LOGGER.info("Recebi a mensagem: %s" + message.toString());
+        LOGGER.info("Recebi a mensagem: " + message);
         LOGGER.info("Dados da mensagem: " + pedido);
     }
 }
