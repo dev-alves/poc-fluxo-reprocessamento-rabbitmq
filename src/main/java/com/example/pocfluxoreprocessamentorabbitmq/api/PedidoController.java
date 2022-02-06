@@ -1,10 +1,12 @@
 package com.example.pocfluxoreprocessamentorabbitmq.api;
 
 import com.example.pocfluxoreprocessamentorabbitmq.domain.model.Pedido;
+import com.example.pocfluxoreprocessamentorabbitmq.domain.service.CadastroPedidoErrorService;
+import com.example.pocfluxoreprocessamentorabbitmq.domain.service.CadastroPedidoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,22 +14,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/pedidos")
 public class PedidoController {
 
-    private RabbitTemplate rabbitTemplate;
+    private final CadastroPedidoService cadastroPedidoService;
+    private final CadastroPedidoErrorService cadastroPedidoErrorService;
     private static final Logger LOGGER = LoggerFactory.getLogger(PedidoController.class);
 
-    public PedidoController(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
+    public PedidoController(CadastroPedidoService cadastroPedidoService, CadastroPedidoErrorService cadastroPedidoErrorService) {
+        this.cadastroPedidoService = cadastroPedidoService;
+        this.cadastroPedidoErrorService = cadastroPedidoErrorService;
     }
 
-    @GetMapping
-    public void obterTodos() {
-        Pedido pedido = new Pedido();
-        pedido.setNome("Carretilha Shimano");
+    @PostMapping
+    public void obterTodos(@RequestBody Pedido pedido) {
+        LOGGER.info("M=obterTodos, B=" + pedido);
 
-        LOGGER.info("Enviando mensagem: " + pedido);
-        rabbitTemplate.convertAndSend("DELAYED-REPROCESS-MESSAGE-ERROR-EXCHANGE", "DELAYED-REPROCESS-MESSAGE-ERROR-QUEUE", pedido, message -> {
-            message.getMessageProperties().setHeader("x-delay", 60000);
-            return message;
-        });
+        try {
+            cadastroPedidoService.cadastrar(pedido);
+        } catch (NullPointerException e) {
+            cadastroPedidoErrorService.sentToExchangeNullPointer(pedido);
+        }
     }
+
 }
