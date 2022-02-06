@@ -11,6 +11,7 @@ public class CadastroPedidoService {
     private final Logger LOGGER = LoggerFactory.getLogger(CadastroPedidoService.class);
 
     public void cadastrar(Pedido pedido) {
+        LOGGER.info("cadastrar, value=" + pedido);
         throw new NullPointerException();
     }
 

@@ -41,7 +41,7 @@ public class CadastroPedidoReprocessListenner {
                 cadastroPedidoService.cadastrar(pedido);
 
             } catch (NullPointerException e) {
-                cadastroPedidoHandleErrorSevice.sentToExchangeNullPointer(message);
+                cadastroPedidoHandleErrorSevice.sendToExchangeNullPointer(message);
             }
         } else {
             LOGGER.info("Limite de retentativas foi alcançado=" + redelayedCount);

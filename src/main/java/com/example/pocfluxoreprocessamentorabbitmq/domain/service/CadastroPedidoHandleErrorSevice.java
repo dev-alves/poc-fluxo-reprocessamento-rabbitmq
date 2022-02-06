@@ -26,7 +26,7 @@ public class CadastroPedidoHandleErrorSevice {
         this.messageConverter = messageConverter;
     }
 
-    public void sentToExchangeNullPointer(Pedido pedido) {
+    public void sendToExchangeNullPointer(Pedido pedido) {
         rabbitTemplate.convertAndSend(ExchangeEnum.DELAYED_REPROCESS_MESSAGE_ERROR.getDescricao(), RoutingKeyEnum.DELAYED_REPROCESS_MESSAGE_ERROR.getDescricao(), pedido, message -> {
             message.getMessageProperties().setHeader("x-delay", DELAYED_TIME);
             message.getMessageProperties().setHeader("x-redelayed-count", START);
@@ -34,7 +34,7 @@ public class CadastroPedidoHandleErrorSevice {
         });
     }
 
-    public void sentToExchangeNullPointer(Message message) {
+    public void sendToExchangeNullPointer(Message message) {
         MessageProperties properties = message.getMessageProperties();
 
         Pedido pedido = (Pedido) messageConverter.fromMessage(message);

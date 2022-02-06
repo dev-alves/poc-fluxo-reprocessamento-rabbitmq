@@ -30,7 +30,7 @@ public class PedidoController {
         try {
             cadastroPedidoService.cadastrar(pedido);
         } catch (NullPointerException e) {
-            cadastroPedidoHandleErrorSevice.sentToExchangeNullPointer(pedido);
+            cadastroPedidoHandleErrorSevice.sendToExchangeNullPointer(pedido);
         }
     }
 
