@@ -12,16 +12,16 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CadastroPedidoErrorService {
+public class CadastroPedidoHandleErrorSevice {
 
     private final static int START = 1;
     private final static int DELAYED_TIME = 6000;
-    private static final Logger LOGGER = LoggerFactory.getLogger(CadastroPedidoErrorService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CadastroPedidoHandleErrorSevice.class);
 
     private final RabbitTemplate rabbitTemplate;
     private final MessageConverter messageConverter;
 
-    public CadastroPedidoErrorService(RabbitTemplate rabbitTemplate, MessageConverter messageConverter) {
+    public CadastroPedidoHandleErrorSevice(RabbitTemplate rabbitTemplate, MessageConverter messageConverter) {
         this.rabbitTemplate = rabbitTemplate;
         this.messageConverter = messageConverter;
     }

@@ -1,7 +1,7 @@
 package com.example.pocfluxoreprocessamentorabbitmq.api;
 
 import com.example.pocfluxoreprocessamentorabbitmq.domain.model.Pedido;
-import com.example.pocfluxoreprocessamentorabbitmq.domain.service.CadastroPedidoErrorService;
+import com.example.pocfluxoreprocessamentorabbitmq.domain.service.CadastroPedidoHandleErrorSevice;
 import com.example.pocfluxoreprocessamentorabbitmq.domain.service.CadastroPedidoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class PedidoController {
 
     private final CadastroPedidoService cadastroPedidoService;
-    private final CadastroPedidoErrorService cadastroPedidoErrorService;
+    private final CadastroPedidoHandleErrorSevice cadastroPedidoHandleErrorSevice;
     private static final Logger LOGGER = LoggerFactory.getLogger(PedidoController.class);
 
-    public PedidoController(CadastroPedidoService cadastroPedidoService, CadastroPedidoErrorService cadastroPedidoErrorService) {
+    public PedidoController(CadastroPedidoService cadastroPedidoService, CadastroPedidoHandleErrorSevice cadastroPedidoHandleErrorSevice) {
         this.cadastroPedidoService = cadastroPedidoService;
-        this.cadastroPedidoErrorService = cadastroPedidoErrorService;
+        this.cadastroPedidoHandleErrorSevice = cadastroPedidoHandleErrorSevice;
     }
 
     @PostMapping
@@ -30,7 +30,7 @@ public class PedidoController {
         try {
             cadastroPedidoService.cadastrar(pedido);
         } catch (NullPointerException e) {
-            cadastroPedidoErrorService.sentToExchangeNullPointer(pedido);
+            cadastroPedidoHandleErrorSevice.sentToExchangeNullPointer(pedido);
         }
     }
 

@@ -1,7 +1,7 @@
 package com.example.pocfluxoreprocessamentorabbitmq.infrastructure.rabbitmq;
 
 import com.example.pocfluxoreprocessamentorabbitmq.domain.model.Pedido;
-import com.example.pocfluxoreprocessamentorabbitmq.domain.service.CadastroPedidoErrorService;
+import com.example.pocfluxoreprocessamentorabbitmq.domain.service.CadastroPedidoHandleErrorSevice;
 import com.example.pocfluxoreprocessamentorabbitmq.domain.service.CadastroPedidoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,14 +17,14 @@ public class CadastroPedidoReprocessListenner {
     private static final Logger LOGGER = LoggerFactory.getLogger(CadastroPedidoReprocessListenner.class);
 
     private CadastroPedidoService cadastroPedidoService;
-    private CadastroPedidoErrorService cadastroPedidoErrorService;
+    private CadastroPedidoHandleErrorSevice cadastroPedidoHandleErrorSevice;
     private MessageConverter messageConverter;
 
     public CadastroPedidoReprocessListenner(CadastroPedidoService cadastroPedidoService,
-                                            CadastroPedidoErrorService cadastroPedidoErrorService,
+                                            CadastroPedidoHandleErrorSevice cadastroPedidoHandleErrorSevice,
                                             MessageConverter messageConverter) {
         this.cadastroPedidoService = cadastroPedidoService;
-        this.cadastroPedidoErrorService = cadastroPedidoErrorService;
+        this.cadastroPedidoHandleErrorSevice = cadastroPedidoHandleErrorSevice;
         this.messageConverter = messageConverter;
     }
 
@@ -41,7 +41,7 @@ public class CadastroPedidoReprocessListenner {
                 cadastroPedidoService.cadastrar(pedido);
 
             } catch (NullPointerException e) {
-                cadastroPedidoErrorService.sentToExchangeNullPointer(message);
+                cadastroPedidoHandleErrorSevice.sentToExchangeNullPointer(message);
             }
         } else {
             LOGGER.info("Limite de retentativas foi alcançado=" + redelayedCount);
