@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CadastroPedidoHandleErrorSevice {
 
-    private final static int START = 1;
+    private final static int START = 0;
     private final static int DELAYED_TIME = 6000;
     private static final Logger LOGGER = LoggerFactory.getLogger(CadastroPedidoHandleErrorSevice.class);
 
@@ -26,7 +26,7 @@ public class CadastroPedidoHandleErrorSevice {
         this.messageConverter = messageConverter;
     }
 
-    public void sendToExchangeNullPointer(Pedido pedido) {
+    public void sendToExchangeDatabaseDown(Pedido pedido) {
         rabbitTemplate.convertAndSend(ExchangeEnum.DELAYED_REPROCESS_MESSAGE_ERROR.getDescricao(), RoutingKeyEnum.DELAYED_REPROCESS_MESSAGE_ERROR.getDescricao(), pedido, message -> {
             message.getMessageProperties().setHeader("x-delay", DELAYED_TIME);
             message.getMessageProperties().setHeader("x-redelayed-count", START);
@@ -34,7 +34,7 @@ public class CadastroPedidoHandleErrorSevice {
         });
     }
 
-    public void sendToExchangeNullPointer(Message message) {
+    public void sendToExchangeDatabaseDown(Message message) {
         MessageProperties properties = message.getMessageProperties();
 
         Pedido pedido = (Pedido) messageConverter.fromMessage(message);
@@ -42,7 +42,7 @@ public class CadastroPedidoHandleErrorSevice {
 
         final int redelayedCount =  ++redelayedCountValue;
 
-        LOGGER.info("sentToExchangeNullPointer, redelayedCount="+ redelayedCount);
+        LOGGER.info("sendToExchangeDatabaseDown, redelayedCount={}", redelayedCount);
 
         rabbitTemplate.convertAndSend(ExchangeEnum.DELAYED_REPROCESS_MESSAGE_ERROR.getDescricao(), RoutingKeyEnum.DELAYED_REPROCESS_MESSAGE_ERROR.getDescricao(), pedido, newMessage -> {
             newMessage.getMessageProperties().setHeader("x-delay", DELAYED_TIME);

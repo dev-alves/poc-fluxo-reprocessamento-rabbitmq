@@ -5,6 +5,7 @@ import com.example.pocfluxoreprocessamentorabbitmq.domain.service.CadastroPedido
 import com.example.pocfluxoreprocessamentorabbitmq.domain.service.CadastroPedidoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,12 +26,12 @@ public class PedidoController {
 
     @PostMapping
     public void obterTodos(@RequestBody Pedido pedido) {
-        LOGGER.info("M=obterTodos, B=" + pedido);
+        LOGGER.info("M=obterTodos, B={}", pedido);
 
         try {
             cadastroPedidoService.cadastrar(pedido);
-        } catch (NullPointerException e) {
-            cadastroPedidoHandleErrorSevice.sendToExchangeNullPointer(pedido);
+        } catch (CannotCreateTransactionException e) {
+            cadastroPedidoHandleErrorSevice.sendToExchangeDatabaseDown(pedido);
         }
     }
 

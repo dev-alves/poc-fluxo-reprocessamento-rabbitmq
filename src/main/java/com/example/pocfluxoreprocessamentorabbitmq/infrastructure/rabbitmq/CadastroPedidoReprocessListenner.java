@@ -10,15 +10,16 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.CannotCreateTransactionException;
 
 @Component
 public class CadastroPedidoReprocessListenner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CadastroPedidoReprocessListenner.class);
 
-    private CadastroPedidoService cadastroPedidoService;
-    private CadastroPedidoHandleErrorSevice cadastroPedidoHandleErrorSevice;
-    private MessageConverter messageConverter;
+    private final CadastroPedidoService cadastroPedidoService;
+    private final CadastroPedidoHandleErrorSevice cadastroPedidoHandleErrorSevice;
+    private final MessageConverter messageConverter;
 
     public CadastroPedidoReprocessListenner(CadastroPedidoService cadastroPedidoService,
                                             CadastroPedidoHandleErrorSevice cadastroPedidoHandleErrorSevice,
@@ -33,18 +34,18 @@ public class CadastroPedidoReprocessListenner {
         MessageProperties properties = message.getMessageProperties();
         int redelayedCount = properties.getHeader("x-redelayed-count");
 
-        LOGGER.info("reprocess, redelayedCount=" + redelayedCount);
+        LOGGER.info("reprocess, redelayedCount={}", redelayedCount);
+
+        Pedido pedido = (Pedido) messageConverter.fromMessage(message);
 
         if (redelayedCount <= LimitRedelivered.LIMIT) {
             try {
-                Pedido pedido = (Pedido) messageConverter.fromMessage(message);
                 cadastroPedidoService.cadastrar(pedido);
-
-            } catch (NullPointerException e) {
-                cadastroPedidoHandleErrorSevice.sendToExchangeNullPointer(message);
+            } catch (CannotCreateTransactionException e) {
+                cadastroPedidoHandleErrorSevice.sendToExchangeDatabaseDown(message);
             }
         } else {
-            LOGGER.info("Limite de retentativas foi alcançado=" + redelayedCount);
+            LOGGER.info("Limite de retentativas foi alcançado {} dados={}", redelayedCount, pedido);
         }
     }
 
